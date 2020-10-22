@@ -8,6 +8,8 @@ import hr.java.covidportal.model.Zupanija;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Glavna {
     public static final int BROJ_ZUPANIJA = 3, BROJ_SIMPTOMA = BROJ_ZUPANIJA, BROJ_BOLESTI = BROJ_ZUPANIJA, BROJ_OSOBA = BROJ_ZUPANIJA;
@@ -15,7 +17,8 @@ public class Glavna {
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
         Zupanija[] zupanije = new Zupanija[BROJ_ZUPANIJA];
-        Simptom[] simptomi = new Simptom[BROJ_SIMPTOMA];
+//        Simptom[] simptomi = new Simptom[BROJ_SIMPTOMA];
+        Simptom[] simptomi;
         Bolest[] bolesti = new Bolest[BROJ_BOLESTI];
         Osoba[] osobe = new Osoba[BROJ_OSOBA];
 
@@ -23,9 +26,13 @@ public class Glavna {
 
         unosZupanija(input, zupanije);
 
-        // Unos Simptoma
+        // Ispis Zupanija - Zadatak 3
 
-        unosSimptoma(input, simptomi);
+        prosjecanBrojStanovnika(zupanije);
+
+        // Unos Simptoma - Zadatak 1
+
+        simptomi = unosSimptoma(input);
 
         // Unos Bolesti
 
@@ -59,13 +66,45 @@ public class Glavna {
         }
     }
 
-    private static void unosSimptoma(Scanner input, Simptom[] simptomi) {
+    // Zadatak 1, Zadatak 2
+
+    private static Simptom[] unosSimptoma(Scanner input) {
         String nazivSimptoma;
         String vrijednostSimptoma;
+        String sifra;
+        String regex = "^[A-Z][0-9]{2}$";
+        Matcher matcher;
+        Pattern pattern = Pattern.compile(regex);
+        Simptom[] simptomi;
+        int brojSimptoma = 0;
+
+        // Zadatak 1 - unos broja simptoma
+
+        do {
+            System.out.printf("Unesite broj simptoma koje planirate unijeti: ");
+            brojSimptoma = Integer.parseInt(input.nextLine());
+            if (brojSimptoma < 0) {
+                System.out.println("Pogrešan unos broja simptoma!");
+            }
+        } while (brojSimptoma < 0);
+
+        simptomi = new Simptom[brojSimptoma];
 
         System.out.printf("Unesite podatke o %d simptoma:%n", simptomi.length);
 
         for (int i = 0; i < simptomi.length; ++i) {
+
+            // Zadatak 2 - provjera i unos šifre simptoma
+
+            do {
+                System.out.printf("Unesite šifru simptoma: ");
+                sifra = input.nextLine();
+                matcher = pattern.matcher(sifra);
+                if(matcher.matches()) {
+                    System.out.println("Pogrešan unos šifre simptoma!");
+                }
+            } while(matcher.matches());
+
             System.out.printf("Unesite naziv simptoma: ");
             nazivSimptoma = input.nextLine();
 
@@ -81,9 +120,10 @@ public class Glavna {
 
             } while (!Arrays.asList(Simptom.RIJETKO, Simptom.SREDNJE, Simptom.CESTO).contains(vrijednostSimptoma));
 
-            simptomi[i] = new Simptom(nazivSimptoma, vrijednostSimptoma);
+            simptomi[i] = new Simptom(nazivSimptoma, vrijednostSimptoma, sifra);
 
         }
+        return simptomi;
     }
 
     private static void unosBolesti(Scanner input, Simptom[] simptomi, Bolest[] bolesti) {
@@ -122,7 +162,7 @@ public class Glavna {
                 // Ispis Postojecih Simptoma
 
                 for (int k = 0; k < simptomi.length; ++k) {
-                    System.out.printf("%d. %s %s%n", k + 1, simptomi[k].getNaziv(), simptomi[k].getVrijednost());
+                    System.out.printf("%d. %s %s %s%n", k + 1, simptomi[k].getNaziv(), simptomi[k].getVrijednost(), simptomi[k].getSifra());
                 }
 
                 // Biranje Postojeceg Simptoma
@@ -159,7 +199,7 @@ public class Glavna {
 
             kopiraniSimptomi = new Simptom[brojOdabranihSimptoma];
             for (int j = 0; j < brojOdabranihSimptoma; ++j) {
-                kopiraniSimptomi[j] = new Simptom(simptomi[odabraniSimptomi[j] - 1].getNaziv(), simptomi[odabraniSimptomi[j] - 1].getVrijednost());
+                kopiraniSimptomi[j] = new Simptom(simptomi[odabraniSimptomi[j] - 1].getNaziv(), simptomi[odabraniSimptomi[j] - 1].getVrijednost(), simptomi[odabraniSimptomi[j] - 1].getSifra());
             }
             bolesti[i] = new Bolest(nazivBolesti, kopiraniSimptomi);
         }
@@ -337,6 +377,18 @@ public class Glavna {
 
             osobe[i] = new Osoba(ime, prezime, starost, zupanija, zarazenBolescu, kontaktiraneOsobe);
         }
+    }
+
+    // Zadatak 3 - ispis prosjecnog broja stanovnika po zupanijama
+
+    private static void prosjecanBrojStanovnika(Zupanija[] zupanije) {
+        double prosjek;
+        int suma = 0;
+        for (Zupanija zupanija : zupanije) {
+            suma += zupanija.getBrojStanovnika();
+        }
+        prosjek = (double) suma / zupanije.length;
+        System.out.printf("Prosječan broj stanovnika po županijama: %f%n", prosjek);
     }
 }
 

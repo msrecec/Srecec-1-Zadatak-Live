@@ -4,11 +4,12 @@ import java.util.Objects;
 
 public class Simptom {
     public static final String RIJETKO = "RIJETKO", SREDNJE = "SREDNJE", CESTO = "ČESTO";
-    private String naziv, vrijednost;
+    private String naziv, vrijednost, sifra;
 
-    public Simptom(String naziv, String vrijednost) {
+    public Simptom(String naziv, String vrijednost, String sifra) {
         this.naziv = naziv;
         this.vrijednost = vrijednost;
+        this.sifra = sifra;
     }
 
     @Override
@@ -39,5 +40,13 @@ public class Simptom {
 
     public void setVrijednost(String vrijednost) {
         this.vrijednost = vrijednost;
+    }
+
+    public String getSifra() {
+        return sifra;
+    }
+
+    public void setSifra(String sifra) {
+        this.sifra = sifra;
     }
 }
